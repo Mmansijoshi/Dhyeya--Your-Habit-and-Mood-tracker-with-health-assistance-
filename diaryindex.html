@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Dear Diary</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <h1>My Dear Diary</h1>
+  <div class="week-container">
+    <script>
+      
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      const today = new Date();
+      const currentDay = today.getDay() === 0 ? 6 : today.getDay() - 1;
+
+      // Get Monday of the current week
+      const startOfWeek = new Date(today);
+      startOfWeek.setDate(today.getDate() - currentDay);
+
+      days.forEach((day, i) => {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        const formattedDate = date.toISOString().split('T')[0];
+
+        const box = document.createElement("div");
+        box.className = "day-box";
+        box.innerHTML = `
+          <h3>${day} <span class="date-text">(${formattedDate})</span></h3>
+          <button ${i > currentDay ? 'disabled' : ''} onclick="location.href='diary.html?day=${day}'">Write</button>
+          <button onclick="location.href='view_entry.html?day=${day}'">Show</button>
+        `;
+        document.querySelector(".week-container").appendChild(box);
+      });
+    </script>
+    <div class="footer">
+      <button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+    </div>
+  </div>
+</body>
+</html>

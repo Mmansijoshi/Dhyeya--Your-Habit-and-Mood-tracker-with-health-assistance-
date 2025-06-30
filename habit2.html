@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Habit Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+  
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #bde0fe, #f3c6ff);
+      font-family: 'Segoe UI', sans-serif;
+      padding: 40px 20px;
+      height: 100vh;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #222;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      background-color: #f1f8fc;
+      padding: 20px 30px 40px 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    .tracking-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .tracking-row strong {
+      width: 160px;
+      text-align: right;
+      margin-right: 10px;
+      font-size: 16px;
+      color: #333;
+    }
+
+    .block {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #ccc;
+      margin-right: 6px;
+      cursor: pointer;
+      background-color: white;
+      position: relative;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+
+    .block:hover::after {
+      content: attr(data-date);
+      position: absolute;
+      top: -28px;
+      left: 0;
+      background: #333;
+      color: white;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      z-index: 10;
+    }
+
+    .block.active {
+      background-color: #4caf50;
+      border-color: #4caf50;
+    }
+
+    .block.disabled {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    .reset-button {
+      display: block;
+      margin: 40px auto 0 auto;
+      padding: 12px 24px;
+      font-size: 16px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .reset-button:hover {
+      background-color: #d32f2f;
+    }
+    .back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  background-color: #673ab7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.back-btn:hover {
+  background-color: #5e35b1;
+}
+
+  </style>
+</head>
+<body>
+  <h1>Welcome to your personalised habit tracking application</h1>
+  <h2>Let's adapt productive habits and improve the quality of our living</h2>
+
+  <div class="container tracking-table" id="trackingTable"></div>
+
+  <button class="reset-button" onclick="resetTracking()">Reset All Activity Progress</button>
+  <button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+  <button class="save-button" onclick="syncToDatabase()">💾 Save Today's Progress</button>
+
+
+  <script>
+    const selected = JSON.parse(localStorage.getItem("selectedActivities")) || [
+      "Reading",
+      "Journaling",
+      "Wake Up Early",
+      "No Sugar",
+      "Meditation",
+      "Photography",
+      "Drink Water"
+    ];
+  
+    const table = document.getElementById("trackingTable");
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Create day headers row
+    const headerRow = document.createElement("div");
+    headerRow.className = "tracking-row";
+
+    // Add an empty label cell to align with habit names
+    const emptyLabel = document.createElement("strong");
+    emptyLabel.textContent = "";
+    headerRow.appendChild(emptyLabel);
+
+    // Add Day 1 to Day 21
+    for (let i = 1; i <= 21; i++) {
+      const dayLabel = document.createElement("div");
+      dayLabel.style.width = "32px";
+      dayLabel.style.height = "32px";
+      dayLabel.style.marginRight = "5px";
+      dayLabel.style.textAlign = "center";
+      dayLabel.style.fontSize = "12px";
+      dayLabel.style.fontWeight = "bold";
+      dayLabel.textContent = ` ${i}`;
+      headerRow.appendChild(dayLabel);
+    }
+
+    table.appendChild(headerRow);
+
+    selected.forEach(activity => {
+      const row = document.createElement("div");
+      row.className = "tracking-row";
+      const label = document.createElement("strong");
+      label.textContent = activity + ":";
+      row.appendChild(label);
+  
+      let startDateKey = `startDate_${activity}`;
+      let startDate = localStorage.getItem(startDateKey);
+      if (!startDate) {
+        startDate = today.toISOString();
+        localStorage.setItem(startDateKey, startDate);
+      }
+  
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+  
+      for (let i = 0; i < 21; i++) {
+        const block = document.createElement("div");
+        block.className = "block";
+        const blockDate = new Date(start);
+        blockDate.setDate(start.getDate() + i);
+        blockDate.setHours(0, 0, 0, 0);
+        const dateKey = blockDate.toDateString();
+        block.dataset.date = dateKey;
+        block.dataset.activity = activity;
+        block.dataset.day = i;
+  
+        const key = `track_${activity}_${dateKey}`;
+        const saved = localStorage.getItem(key);
+        if (saved) {
+          block.classList.add("active");
+        }
+  
+        if (blockDate.getTime() !== today.getTime()) {
+          block.classList.add("disabled");
+        } else {
+          block.addEventListener("click", () => {
+            const isActive = block.classList.contains("active");
+  
+            // Remove any other active block for today
+            for (let j = 0; j < 21; j++) {
+              const compareDate = new Date(start);
+              compareDate.setDate(start.getDate() + j);
+              if (compareDate.toDateString() === today.toDateString()) {
+                const compareKey = `track_${activity}_${compareDate.toDateString()}`;
+                const tempBlock = row.querySelector(`.block[data-day='${j}']`);
+                if (tempBlock) tempBlock.classList.remove("active");
+                localStorage.removeItem(compareKey);
+              }
+            }
+  
+            if (!isActive) {
+              block.classList.add("active");
+              localStorage.setItem(key, "1");
+              updateStreakForToday();
+            }
+          });
+        }
+  
+        row.appendChild(block);
+      }
+  
+      table.appendChild(row);
+    });
+  
+    function updateStreakForToday() {
+      const todayStr = today.toDateString();
+      const markedDates = JSON.parse(localStorage.getItem("markedDates")) || [];
+      if (!markedDates.includes(todayStr)) {
+        markedDates.push(todayStr);
+        localStorage.setItem("markedDates", JSON.stringify(markedDates));
+        localStorage.setItem("streak", markedDates.length);
+      }
+    }
+  
+    function resetTracking() {
+      if (confirm("Are you sure you want to reset all tracked data?")) {
+        for (let key in localStorage) {
+          if (key.startsWith("track_") || key.startsWith("startDate_")) {
+            localStorage.removeItem(key);
+          }
+        }
+        localStorage.removeItem("markedDates");
+        localStorage.removeItem("streak");
+        location.reload();
+      }
+    }
+    function syncToDatabase() {
+  const habitData = [];
+
+  selected.forEach(activity => {
+    const startDateKey = `startDate_${activity}`;
+    const startDateStr = localStorage.getItem(startDateKey);
+    if (!startDateStr) return;
+
+    const startDate = new Date(startDateStr);
+    startDate.setHours(0, 0, 0, 0);
+
+    for (let i = 0; i < 21; i++) {
+      const blockDate = new Date(startDate);
+      blockDate.setDate(startDate.getDate() + i);
+      const dateStr = blockDate.toDateString();
+      const key = `track_${activity}_${dateStr}`;
+      const completed = localStorage.getItem(key);
+
+      if (completed) {
+        habitData.push({
+          activity_name: activity,
+          activity_date: blockDate.toISOString().slice(0, 10),
+          completed: true
+        });
+      }
+    }
+  });
+
+  if (habitData.length === 0) {
+    alert("No completed habits to sync.");
+    return;
+  }
+
+  fetch('/save-habits', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ habits: habitData }),
+    credentials: 'include' // Important for session
+  })
+  .then(res => {
+    if (res.ok) {
+      alert("Habits synced to database!");
+    } else if (res.status === 401) {
+      alert("Login required to sync.");
+    } else {
+      alert("Sync failed");
+    }
+  })
+  .catch(err => console.error(err));
+}
+
+  </script>
+</body>
+</html>

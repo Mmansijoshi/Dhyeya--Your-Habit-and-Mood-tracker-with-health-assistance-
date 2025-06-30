@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up — Dhyeya</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; font-family: Arial, sans-serif; }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url('register.jpg') no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    .register-container {
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 360px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .register-container h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+      font-size: 1.75rem;
+    }
+
+    .register-container form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .register-container input[type="text"],
+    .register-container input[type="email"],
+    .register-container input[type="password"],
+    .register-container input[type="date"] {
+      padding: 0.75rem 1rem;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-size: 0.875rem;
+      text-align: left;
+      margin-top: -0.75rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .register-btn {
+      padding: 0.75rem;
+      background-color: #6c63ff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .register-btn:hover {
+      background-color: #574eda;
+    }
+
+    .login-link {
+      margin-top: 1.25rem;
+      font-size: 0.875rem;
+    }
+    .login-link a {
+      color: #6c63ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .login-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="register-container">
+    <h2>Create Account</h2>
+    <form action="/register" method="POST" onsubmit="return validateRegistration()">
+      <input
+        type="text"
+        name="name"
+        id="nameInput"
+        placeholder="Full Name"
+        required
+      />
+      <div class="error" id="nameError">Please enter your full name.</div>
+
+      <input
+        type="date"
+        name="dob"
+        id="dobInput"
+        placeholder="Date of Birth"
+        required
+      />
+      <div class="error" id="dobError">Please enter your date of birth.</div>
+
+      <input
+        type="email"
+        name="email"
+        id="emailInput"
+        placeholder="Email Address"
+        required
+      />
+      <div class="error" id="emailError">Enter a valid email address.</div>
+
+      <input
+        type="password"
+        name="password"
+        id="passwordInput"
+        placeholder="Password"
+        required
+      />
+      <div class="error" id="passwordError">Password must be at least 6 characters.</div>
+
+      <input
+        type="password"
+        name="confirmPassword"
+        id="confirmPasswordInput"
+        placeholder="Confirm Password"
+        required
+      />
+      <div class="error" id="confirmPasswordError">Passwords do not match.</div>
+
+      <button type="submit" class="register-btn">Sign Up</button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a href="/login.html">Log In</a>
+    </div>
+  </div>
+
+  <script>
+    function validateRegistration() {
+      const name = document.getElementById('nameInput').value.trim();
+      const dob = document.getElementById('dobInput').value;
+      const email = document.getElementById('emailInput').value.trim();
+      const pwd = document.getElementById('passwordInput').value;
+      const confirmPwd = document.getElementById('confirmPasswordInput').value;
+      let valid = true;
+
+      document.getElementById('nameError').style.display = name ? 'none' : 'block';
+      if (!name) valid = false;
+
+      document.getElementById('dobError').style.display = dob ? 'none' : 'block';
+      if (!dob) valid = false;
+
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailValid = emailPattern.test(email);
+      document.getElementById('emailError').style.display = emailValid ? 'none' : 'block';
+      if (!emailValid) valid = false;
+
+      document.getElementById('passwordError').style.display = pwd.length >= 6 ? 'none' : 'block';
+      if (pwd.length < 6) valid = false;
+
+      const passwordsMatch = pwd === confirmPwd;
+      document.getElementById('confirmPasswordError').style.display = passwordsMatch ? 'none' : 'block';
+      if (!passwordsMatch) valid = false;
+
+      return valid;
+    }
+  </script>
+</body>
+</html>

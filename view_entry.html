@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Diary Entry</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .entry-container {
+      background: #f9f9f9;
+      padding: 20px;
+      margin: 40px auto;
+      max-width: 700px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .mood {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    .content {
+      border: 1px solid #ccc;
+      padding: 15px;
+      background: white;
+      min-height: 150px;
+    }
+    .back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  background-color: #673ab7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+  </style>
+</head>
+<body>
+  <div class="entry-container">
+    <h2 id="day-title">Diary Entry</h2>
+    <div id="mood" class="mood"><em>Loading mood...</em></div>
+    <div id="content" class="content"><em>Loading content...</em></div>
+    <div class="footer">
+      <button class="back-btn" onclick="window.location.href='diaryindex.html'">⬅ Back </button>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const day = params.get('day') || 'Unknown';
+    document.getElementById('day-title').textContent = `Diary Entry for ${day}`;
+
+    const entry = localStorage.getItem(`diary_${day}`);
+    if (entry) {
+      const data = JSON.parse(entry);
+      document.getElementById('mood').textContent = `Mood: ${data.mood}`;
+      document.getElementById('content').innerHTML = data.content;
+    } else {
+      document.getElementById('mood').innerHTML = `<em>No mood recorded.</em>`;
+      document.getElementById('content').innerHTML = `<em>No diary entry found for ${day}.</em>`;
+    }
+  </script>
+</body>
+</html>

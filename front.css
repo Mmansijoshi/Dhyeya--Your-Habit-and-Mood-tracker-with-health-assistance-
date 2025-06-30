@@ -1,0 +1,81 @@
+/* make sure you saved this file as styles.css */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: url('https://images.unsplash.com/photo-1588776814546-ec7e3e8f7c8f?auto=format&fit=crop&w=1350&q=80')
+                no-repeat center center fixed;
+    background-size: cover;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  .container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: rgba(255, 248, 244, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .section {
+    margin: 20px 0;
+  }
+  
+  .section label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .mood-options span {
+    font-size: 28px;
+    cursor: pointer;
+    margin-right: 8px;
+    transition: transform 0.2s;
+  }
+  
+  .mood-options span:hover {
+    transform: scale(1.2);
+  }
+  
+  .mood-options span.selected {
+    border-bottom: 2px solid #333;
+  }
+  
+  .stars {
+    font-size: 28px;
+    color: gold;
+    cursor: pointer;
+  }
+  
+  .water-glasses {
+    display: flex;
+    gap: 8px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
+  .todo-list {
+    border: 1px solid #ccc;
+    background: #fff;
+    padding: 10px;
+    border-radius: 8px;
+    list-style: disc inside;
+    min-height: 80px;
+  }
+  
+  textarea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    background: #fff;
+  }
+  

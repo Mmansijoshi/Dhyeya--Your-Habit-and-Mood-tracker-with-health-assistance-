@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mental Health Chat Tracker</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(145deg, #a9c0de, #fefeff);
+    }
+
+    .chat-container {
+      max-width: 600px;
+      margin: 0 auto;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #ffffff;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .chat-box {
+  flex: 1;
+  padding: 30px 20px 10px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+
+    .message {
+      max-width: 70%;
+      padding: 12px 16px;
+      margin-bottom: 10px;
+      border-radius: 15px;
+      display: inline-block;
+      font-size: 15px;
+      position: relative;
+    }
+
+    .bot-message {
+  align-self: flex-start;
+  background-color: #55abd6;
+  border-bottom-left-radius: 0;
+  position: relative;
+  margin-left: 50px; /* Push bubble right to make space for avatar */
+}
+
+.bot-message::before {
+  content: '';
+  background-image: url('chucky.png'); /* your avatar file */
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  left: -50px; /* place the icon to the left of the bubble */
+  top: 0;
+  width: 50px;
+  height:50px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+    .user-message {
+      align-self: flex-end;
+      background-color: #ccbff1;
+      border-bottom-right-radius: 0;
+    }
+
+    .options-area {
+      padding: 10px;
+      background: #ffffff;
+      border-top: 1px solid #ddd;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .option-btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      background: #3498db;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .date-picker {
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid #3498db;
+      font-size: 16px;
+    }
+
+    .input-box {
+      padding: 10px;
+      width: 100%;
+      max-width: 500px;
+      font-size: 16px;
+      border: 1px solid #f9d4fe;
+      border-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-box" id="chatBox">
+      <div class="message bot-message">Hi! Let's track your mental health. What's the date today?</div>
+    </div>
+    <div class="options-area" id="optionsArea">
+      <input type="date" id="dateInput" class="date-picker" />
+      <button class="option-btn" onclick="submitDate()">Submit</button>
+    </div>
+  </div>
+
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const optionsArea = document.getElementById('optionsArea');
+    const dateInput = document.getElementById('dateInput');
+
+    const questions = [
+      { text: "Did you exercise today?", options: ["Yes", "No"] },
+      { text: "How is your mood?", options: ["😊", "🙂", "😐", "☹️", "😢"] },
+      { text: "How many hours did you sleep?", options: ["0-3", "4-6", "7-9", "10-12"] },
+      { text: "Rate your productivity today", options: ["★", "★★", "★★★", "★★★★", "★★★★★"] },
+      { text: "How many glasses of water did you drink?", options: ["0", "1", "2", "3", "4", "5", "6", "7", "8"] },
+      { text: "What are 5 things you are grateful for today?", options: null },
+      { text: "Thanks! Want to save this?", options: ["Yes", "No"] }
+    ];
+
+    let answers = [];
+    let questionIndex = 0;
+
+    function appendMessage(text, type) {
+      const message = document.createElement('div');
+      message.className = `message ${type}-message`;
+      message.textContent = text;
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showOptions(options) {
+      optionsArea.innerHTML = '';
+      if (options) {
+        options.forEach(option => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = option;
+          btn.onclick = () => handleOptionClick(option);
+          optionsArea.appendChild(btn);
+        });
+      } else {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Type your answer...';
+        input.className = 'input-box';
+        const submit = document.createElement('button');
+        submit.className = 'option-btn';
+        submit.textContent = 'Submit';
+        submit.onclick = () => handleOptionClick(input.value);
+        optionsArea.appendChild(input);
+        optionsArea.appendChild(submit);
+      }
+    }
+
+    function handleOptionClick(option) {
+      if (!option.trim()) return;
+      appendMessage(option, 'user');
+
+      if (questionIndex === questions.length - 1 && option === "No") {
+        appendMessage("Okay, let's start over!", 'bot');
+        answers = [];
+        questionIndex = 0;
+        setTimeout(() => {
+          appendMessage(questions[0].text, 'bot');
+          showOptions(questions[0].options);
+        }, 1000);
+        return;
+      }
+
+      if (questionIndex === questions.length - 1 && option === "Yes") {
+  appendMessage("Saving your data... ✅", "bot");
+
+  const [exercise, mood, sleep_range, productivity, water_count, gratitude] = answers.slice(0, 6);
+
+  const entry = {
+    entry_date: dateInput.value,
+    exercise,
+    mood,
+    sleep_range,
+    productivity,
+    water_count,
+    gratitude
+  };
+
+  fetch("http://localhost:3000/save-entry", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(entry)
+  })
+  .then(response => response.json())
+  .then(data => {
+    appendMessage(data.message || "Saved!", "bot");
+    optionsArea.innerHTML = '';
+  })
+  .catch(error => {
+    appendMessage("Error saving data 😞", "bot");
+    console.error("Save error:", error);
+  });
+
+  return; // Stop further execution
+}
+
+      answers.push(option);
+      questionIndex++;
+
+      if (questionIndex < questions.length) {
+        setTimeout(() => {
+          appendMessage(questions[questionIndex].text, 'bot');
+          showOptions(questions[questionIndex].options);
+        }, 500);
+      } else {
+        setTimeout(() => {
+          appendMessage("All done! You can now save your data.", 'bot');
+          optionsArea.innerHTML = '';
+        }, 500);
+      }
+    }
+
+    function submitDate() {
+      const dateValue = dateInput.value;
+      if (!dateValue) return alert("Please select a date!");
+      appendMessage(dateValue, 'user');
+      optionsArea.innerHTML = '';
+      setTimeout(() => {
+        appendMessage(questions[0].text, 'bot');
+        showOptions(questions[0].options);
+      }, 500);
+    }
+  </script>
+</body>
+</html>

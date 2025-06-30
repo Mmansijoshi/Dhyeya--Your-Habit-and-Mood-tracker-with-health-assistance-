@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mood & Water Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
+      margin: 0;
+      padding: 20px;
+      color: #333;
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .chart-container, .glass-container {
+      width: 90%;
+      max-width: 700px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    #glass {
+      width: 120px;
+      height: 300px;
+      border: 4px solid #3498db;
+      border-radius: 10px;
+      position: relative;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    #water-fill {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      background: linear-gradient(to top, #3498db, #5dade2);
+      transition: height 0.5s ease;
+    }
+
+    .label {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🧠 Daily Mood & Hydration Report</h1>
+
+  <div class="chart-container">
+    <h3>😊 Mood Chart (Day 1)</h3>
+    <canvas id="moodChart"></canvas>
+  </div>
+
+  <div class="glass-container">
+    <h3>💧 Water Intake (Day 1)</h3>
+    <div id="glass">
+      <div id="water-fill"></div>
+    </div>
+    <div class="label" id="glassLabel">Filling...</div>
+  </div>
+
+  <div class="chart-container">
+    <h3>📊 Habit Completion Stats</h3>
+    <canvas id="habitBarChart"></canvas>
+  </div>
+  
+
+  <script>
+    const emojiLabels = ["😢", "☹️", "😐", "🙂", "😊", "😄"];
+    const emojiToValue = { "😢": 0, "☹️": 1, "😐": 2, "🙂": 3, "😊": 4, "😄": 5 };
+    const valueToEmoji = ["😢", "☹️", "😐", "🙂", "😊", "😄"];
+  
+    fetch('/get-entries')
+      .then(res => res.json())
+      .then(data => {
+        if (data.length === 0) {
+          alert("No data available");
+          return;
+        }
+  
+        // ✅ Build mood data for scatter chart
+        const moodData = data.map(entry => ({
+          x: entry.entry_date,
+          y: emojiToValue[entry.mood] ?? 0
+        }));
+  
+        // ✅ Build water intake data (optional: average or per day)
+        const avgWater = data.reduce((sum, e) => sum + (parseInt(e.water_count) || 0), 0) / data.length;
+        const fillPercent = Math.min((avgWater / 8) * 100, 100);
+  
+        // 🟣 Render Mood Scatter Chart
+        new Chart(document.getElementById('moodChart'), {
+          type: 'scatter',
+          data: {
+            datasets: [{
+              label: "Mood Score",
+              data: moodData,
+              backgroundColor: "#8e44ad",
+              pointRadius: 8
+            }]
+          },
+          options: {
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: ctx => `Mood: ${valueToEmoji[ctx.parsed.y]} on ${ctx.parsed.x}`
+                }
+              }
+            },
+            scales: {
+              x: {
+                title: { display: true, text: "Date" },
+                type: 'category'
+              },
+              y: {
+                title: { display: true, text: "Mood" },
+                ticks: {
+                  callback: val => valueToEmoji[val] || ''
+                },
+                min: 0,
+                max: 5,
+                stepSize: 1
+              }
+            }
+          }
+        });
+  
+        // 🟦 Fill Water Glass (based on average intake)
+        const fillDiv = document.getElementById("water-fill");
+        const label = document.getElementById("glassLabel");
+  
+        fillDiv.style.height = `${fillPercent}%`;
+        label.textContent = `Avg Water: ${avgWater.toFixed(1)} glasses (${(avgWater * 0.50).toFixed(1)} L)`;
+      })
+      .catch(err => {
+        console.error("Error:", err);
+        alert("Failed to load report.");
+      });
+
+      // 🎯 Fetch habit stats and draw bar chart
+      fetch('/habit-summary')
+  .then(res => res.json())
+  .then(data => {
+    const labels = data.map(entry => entry.activity_date);
+    const counts = data.map(entry => entry.count);
+
+    new Chart(document.getElementById('habitBarChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: "Habits Completed",
+          data: counts,
+          backgroundColor: "#3498db"
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          title: {
+            display: true,
+            text: '📅 Daily Habit Completion',
+            font: { size: 18 }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: 'Number of Activities' }
+          },
+          x: {
+            title: { display: true, text: 'Date' }
+          }
+        }
+      }
+    });
+  });
+
+  </script>
+  
+</body>
+</html>

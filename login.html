@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f0fdfd;
+    }
+
+    .wrapper {
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .form-container {
+      flex: 1;
+      padding: 60px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      background: #fff;
+    }
+
+    .form-container h2 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      border-bottom: 4px solid #00a8a8;
+      display: inline-block;
+      padding-bottom: 6px;
+      
+      color: #007a7a;
+    }
+
+    form {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-size: 13px;
+      margin-top: -8px;
+      margin-bottom: 10px;
+      text-align: left;
+      display: none;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+
+    .options label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .login-button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      background-color: #00a8a8;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .login-button:hover {
+      background-color: #008080;
+    }
+
+    .bottom-text {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .bottom-text a {
+      text-decoration: none;
+      color: #007a7a;
+    }
+
+    .bottom-text a:hover {
+      text-decoration: underline;
+    }
+
+    .illustration {
+      flex: 2;
+      background: linear-gradient(145deg, #a3e3e3, #5cd2d2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .illustration img {
+      width: 60%;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Login Form Section -->
+    <div class="form-container">
+      <h2>Login</h2>
+      <form action="/login" method="POST" onsubmit="return validateForm()">
+        <input
+          type="email"
+          name="email"
+          id="emailInput"
+          placeholder="Enter your email"
+          required
+        />
+
+        <input
+          type="password"
+          name="password"
+          id="passwordInput"
+          placeholder="Enter your password"
+          required
+        />
+
+        <div class="error" id="passwordError">Password must be at least 6 characters.</div>
+
+        <div class="options">
+          <label><input type="checkbox" name="remember" /> Remember Me</label>
+          <a href="/forgot-password.html">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="login-button">Login</button>
+      </form>
+
+      <p class="bottom-text">Don't have an account? <a href="/register.html">Sign Up</a></p>
+    </div>
+
+    <!-- Right Illustration Section -->
+    <div class="illustration">
+      <img src="love.png" alt="Laptop Illustration" />
+    </div>
+  </div>
+
+  <script>
+    function validateForm() {
+      const password = document.getElementById("passwordInput").value;
+      const errorDiv = document.getElementById("passwordError");
+      if (password.length < 6) {
+        errorDiv.style.display = "block";
+        return false;
+      } else {
+        errorDiv.style.display = "none";
+        return true;
+      }
+    }
+  </script>
+</body>
+</html>

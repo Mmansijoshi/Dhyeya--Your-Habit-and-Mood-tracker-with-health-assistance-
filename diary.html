@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Write Diary</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .mood-picker span {
+      font-size: 24px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
+    .mood-picker span.selected {
+      outline: 2px solid #333;
+      border-radius: 50%;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #bde0fe, #cfedee);
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+    }
+    .back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  background-color: #2084b9;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+    
+
+  </style>
+</head>
+<body>
+  <h1 id="diary-title">Diary Entry</h1>
+
+  <!-- Mood Picker -->
+  <div class="mood-picker">
+    <strong>Select your mood:</strong>
+    <span onclick="selectMood('😄')">😄</span>
+    <span onclick="selectMood('😐')">😐</span>
+    <span onclick="selectMood('😢')">😢</span>
+    <span onclick="selectMood('😠')">😠</span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button onclick="execCmd('bold')"><b>B</b></button>
+    <button onclick="execCmd('underline')"><u>U</u></button>
+    <button onclick="execCmd('backColor', 'yellow')">Highlight</button>
+    <button onclick="execCmd('fontSize', '5')">Big</button>
+    <button onclick="execCmd('foreColor', 'purple')">Color</button>
+    <button onclick="execCmd('insertUnorderedList')">• List</button>
+    <button onclick="execCmd('insertOrderedList')">1. List</button>
+    <button onclick="execCmd('undo')">Undo</button>
+    <button onclick="execCmd('redo')">Redo</button>
+    <input type="file" onchange="handleImage(event)">
+  </div>
+
+  <!-- Editor -->
+  <div id="editor" contenteditable="true"></div>
+
+  <!-- Save -->
+  <button onclick="saveEntry()">Save</button>
+  <div class="footer">
+  <button class="back-btn" onclick="window.location.href='diaryindex.html'">⬅ Back </button>
+</div>
+  </body>
+
+  <script src="editor.js"></script>
+  <script>
+    let selectedMood = '';
+    let imageBase64 = '';  // store globally
+  
+    function selectMood(emoji) {
+      selectedMood = emoji;
+      document.querySelectorAll('.mood-picker span').forEach(span => {
+        span.classList.remove('selected');
+        if (span.textContent === emoji) {
+          span.classList.add('selected');
+        }
+      });
+    }
+  
+    function handleImage(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          imageBase64 = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+  
+    async function saveEntry() {
+      console.log("📌 Save button clicked");
+      const params = new URLSearchParams(window.location.search);
+const rawDay = params.get('day');
+let day;
+
+if (rawDay && /^\d{4}-\d{2}-\d{2}$/.test(rawDay)) {
+  // ✅ use only if it looks like a date (YYYY-MM-DD)
+  day = rawDay;
+} else {
+  // fallback to today's date
+  day = new Date().toISOString().split('T')[0];
+}
+
+    
+      const content = document.getElementById('editor').innerHTML;
+      const mood = selectedMood || '😐';
+  
+      // Optional: wait a few ms to ensure imageBase64 is loaded
+      await new Promise(resolve => setTimeout(resolve, 200));
+  
+      const response = await fetch("/save-diary", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  credentials: "include", // 🔥 Add this line to send cookies!
+  body: JSON.stringify({
+    entry_date: day,
+    mood: mood,
+    content: content,
+    image_base64: imageBase64
+  })
+});
+
+  
+      const result = await response.json();
+      alert(result.message);
+    }
+  </script>
+  
+  
+</body>
+</html>

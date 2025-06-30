@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Inner Peace vs Inner Demons</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(to bottom, #e0f7fa, #fff);
+      font-family: 'Segoe UI', sans-serif;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: linear-gradient(to bottom, #dcedc8, #f0f4c3);
+      border: 2px solid #333;
+      margin-top: 20px;
+    }
+
+    #info {
+      text-align: center;
+      padding: 10px;
+      font-size: 18px;
+      color: #333;
+    }
+
+    #game-over {
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      font-size: 32px;
+      font-weight: bold;
+      color: #d32f2f;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">💖 Lives: <span id="lives">3</span> | ☮ Peace Points: <span id="score">0</span></div>
+  <div id="game-over">🧘‍♀ Game Over. You were overwhelmed.<br>Refresh to try again.</div>
+  <canvas id="gameCanvas" width="600" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    let peace = {
+      x: 270,
+      y: 440,
+      width: 60,
+      height: 60,
+      color: "#4caf50",
+      speed: 5
+    };
+
+    let bullets = [];
+    let demons = [];
+    let score = 0;
+    let lives = 3;
+
+    const demonNames = ["Fear", "Anger", "Shame", "Doubt", "Guilt"];
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowLeft" && peace.x > 0) peace.x -= peace.speed;
+      if (e.key === "ArrowRight" && peace.x + peace.width < canvas.width) peace.x += peace.speed;
+      if (e.key === " " || e.key === "Spacebar") {
+        bullets.push({ x: peace.x + peace.width / 2 - 5, y: peace.y, width: 10, height: 20 });
+      }
+    });
+
+    function spawnDemon() {
+      const name = demonNames[Math.floor(Math.random() * demonNames.length)];
+      demons.push({
+        x: Math.random() * (canvas.width - 50),
+        y: -30,
+        width: 50,
+        height: 50,
+        speed: 1 + Math.random() * 2,
+        label: name
+      });
+    }
+
+    function drawPeace() {
+      ctx.fillStyle = peace.color;
+      ctx.beginPath();
+      ctx.arc(peace.x + peace.width / 2, peace.y + peace.height / 2, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "white";
+      ctx.font = "16px Arial";
+      ctx.fillText("🧘", peace.x + 15, peace.y + 38);
+    }
+
+    function drawBullets() {
+      ctx.fillStyle = "#81c784";
+      bullets.forEach((b) => {
+        ctx.fillRect(b.x, b.y, b.width, b.height);
+      });
+    }
+
+    function drawDemons() {
+      demons.forEach((d) => {
+        ctx.fillStyle = "#e57373";
+        ctx.fillRect(d.x, d.y, d.width, d.height);
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px Arial";
+        ctx.fillText(d.label, d.x + 5, d.y + 28);
+      });
+    }
+
+    function detectCollisions() {
+      bullets.forEach((b, bi) => {
+        demons.forEach((d, di) => {
+          if (
+            b.x < d.x + d.width &&
+            b.x + b.width > d.x &&
+            b.y < d.y + d.height &&
+            b.y + b.height > d.y
+          ) {
+            bullets.splice(bi, 1);
+            demons.splice(di, 1);
+            score += 1;
+            document.getElementById("score").textContent = score;
+          }
+        });
+      });
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      drawPeace();
+
+      bullets.forEach((b, i) => {
+        b.y -= 5;
+        if (b.y < 0) bullets.splice(i, 1);
+      });
+
+      demons.forEach((d, i) => {
+        d.y += d.speed;
+        if (d.y > canvas.height) {
+          demons.splice(i, 1);
+          lives -= 1;
+          document.getElementById("lives").textContent = lives;
+          if (lives <= 0) {
+            document.getElementById("game-over").style.display = "block";
+            cancelAnimationFrame(loop);
+          }
+        }
+      });
+
+      drawBullets();
+      drawDemons();
+      detectCollisions();
+    }
+
+    function gameLoop() {
+      update();
+      loop = requestAnimationFrame(gameLoop);
+    }
+
+    let loop = requestAnimationFrame(gameLoop);
+    setInterval(spawnDemon, 2000); // Spawn a demon every 2 seconds
+  </script>
+</body>
+</html>

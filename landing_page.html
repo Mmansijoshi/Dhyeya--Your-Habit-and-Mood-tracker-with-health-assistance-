@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dhyeya Landing Page</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    
+
+    body {
+  background: url('background.webp') no-repeat center center/cover;
+  color: white;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+  position: relative;
+  flex-direction: column;
+}
+
+    body.dark-mode {
+      background: linear-gradient(to bottom, #1e1e2f, #2c2c3d);
+      color: #f2f2f2;
+    }
+
+    .background-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('wall.png') no-repeat center center/cover;
+      filter: blur(10px);
+      z-index: -1;
+      opacity: 0.6;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 40px;
+    }
+
+    .logo {
+      width: 250px;
+      margin-right: 50px;
+    }
+
+    .title-block {
+      text-align: left;
+    }
+
+    h1 {
+      font-size: 96px;
+      margin: 0;
+      color: #3a3a3a;
+    }
+
+    .dark-mode h1 {
+      color: #fff;
+    }
+
+    .tagline {
+      font-size: 40px;
+      color: #333;
+    }
+
+    .dark-mode .tagline {
+      color: #ccc;
+    }
+
+    .content {
+      margin-top: 30px;
+      max-width: 700px;
+      text-align: center;
+      padding: 0 20px;
+      font-size: 18px;
+      z-index: 1;
+    }
+
+    .dark-mode .content {
+      color: #ddd;
+    }
+
+    .content span {
+      font-weight: bold;
+      color: #5e35b1;
+    }
+
+    .toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      cursor: pointer;
+      background: #ffffffcc;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+
+    .dark-mode .toggle {
+      background: #444;
+      color: #fff;
+    }
+
+    .login-button {
+      margin-top: 50px;
+      margin-bottom: 40px;
+      padding: 15px 30px;
+      font-size: 18px;
+      background-color: #6200ea;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      z-index: 1;
+    }
+
+    .login-button:hover {
+      background-color: #3700b3;
+    }
+
+    .dark-mode .login-button {
+      background-color: #bb86fc;
+      color: #000;
+    }
+
+    .dark-mode .login-button:hover {
+      background-color: #9b5de5;
+    }
+
+    /* Floating logo */
+.logo {
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Pulsing glow on button */
+.login-button {
+  box-shadow: 0 0 0 rgba(255, 183, 3, 0.7);
+  animation: pulseGlow 2s infinite;
+}
+
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 183, 3, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 20px 10px rgba(255, 183, 3, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 183, 3, 0);
+  }
+}
+
+/* Gentle waving text effect */
+.content, .tagline {
+  animation: waveText 6s ease-in-out infinite;
+}
+
+@keyframes waveText {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+
+.rocket-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 250px;
+  height: 250px;
+  margin-left: -125px;
+  margin-top: -125px;
+  z-index: 5;
+  pointer-events: none;
+  animation: spinOrbit 10s linear infinite;
+}
+.rocket-wrapper {
+  width: 250px;
+  height: 250px;
+  margin-left: -125px;
+  margin-top: -125px;
+}
+
+.orbit-rocket {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 40px;
+  transform: translateX(-50%);
+  animation: rotateRocket 10s linear infinite;
+}
+
+@keyframes spinOrbit {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateRocket {
+  from { transform: translateX(-50%) rotate(0deg); }
+  to { transform: translateX(-50%) rotate(-360deg); }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Blurred background image -->
+  <div class="background-image"></div>
+  
+
+  <!-- Toggle for dark mode -->
+  <div class="toggle" onclick="toggleDarkMode()">🌙 Toggle</div>
+
+  <!-- Logo and Tagline -->
+  <header>
+    <img src="logo2.png" alt="Dhyeya Logo" class="logo">
+    <div class="title-block">
+      <h1>Dhyeya</h1>
+      <div class="tagline">Your Journey, Your Growth</div>
+    </div>
+    
+    
+
+  </header>
+
+  <!-- Landing Text -->
+  <div class="content">
+    Welcome to <span>Dhyeya</span>, a space dedicated to self-discovery and mental wellness.<br><br>
+    With <span>Dhyeya</span>, track habits that nurture your mind and body.<br><br>
+    Let <span>Dhyeya</span> guide you through reflections, routines, and mindfulness.<br><br>
+    At <span>Dhyeya</span>, growth is a journey, not a race.<br><br>
+    Start today — your purpose starts with <span>Dhyeya</span>.
+  </div>
+
+  <!-- Login / Signup Button -->
+  <a href="login.html">
+    <button class="login-button">Login</button>
+  </a>
+  
+
+  <script>
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+  </script>
+
+</body>
+</html>

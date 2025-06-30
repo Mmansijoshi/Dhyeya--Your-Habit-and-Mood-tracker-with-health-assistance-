@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Interactive Health Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-main: #f9fbfd;
+      --bg-sidebar: #0b0f29;
+      --text-main: #1e293b;
+      --text-light: white;
+    }
+
+    .highlight-diary {
+    border: 2px solid #6a0dad;
+    border-radius: 50%;
+    background-color: #f8e1ff;
+    color: black;
+  }
+
+    body.dark {
+      --bg-main: #121212;
+      --bg-sidebar: #1e1e2f;
+      --text-main: #e0e0e0;
+      --text-light: #ffffff;
+    }
+    .game img {
+  width: 150px;   /* 👈 Decrease these values */
+  height: 80px;
+}
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: var(--bg-sidebar);
+      color: var(--text-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      border-top-right-radius: 30px;
+      border-bottom-right-radius: 30px;
+      overflow: hidden;
+      box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar img.sidebar-graphic {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .user-avatar {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 10px 0 10px 0;
+      background: url('https://cdn-icons-png.flaticon.com/512/2922/2922510.png') no-repeat center/cover;
+    }
+
+    .user-name {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-icons {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 10px;
+    }
+
+    .sidebar-icons a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: var(--text-light);
+      font-size: 12px;
+    }
+
+    .sidebar-icons img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 4px;
+    }
+
+    .connect {
+      margin-top: auto;
+      text-align: center;
+      font-size: 14px;
+      padding: 10px;
+    }
+
+    .connect a {
+      display: block;
+      color: #ccc;
+      margin: 4px 0;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .connect a:hover {
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px 50px;
+      background-color: var(--bg-main);
+      border-top-left-radius: 30px;
+      border-bottom-left-radius: 30px;
+      box-shadow: inset 10px 0 20px rgba(0, 0, 0, 0.03);
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-weight: 600;
+    }
+
+    .search {
+      padding: 8px 16px;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+      width: 200px;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: absolute;
+      right: 120px;
+      top: 0;
+    }
+
+    .chart-container {
+  height: 220px;    /* total card height can stay the same */
+  position: relative;
+}
+.chart-container canvas {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+
+
+    .diary-button {
+      position: absolute;
+      right: 0;
+      top: 0;
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      background-color: #10b981;
+      color: white;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      padding-top: 20px;
+      position: relative;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .chart-container, .calendar, .info {
+      background-color: rgb(255, 255, 255);
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+
+    body.dark .chart-container,
+    body.dark .calendar,
+    body.dark .info {
+      background-color: #1e1e2e;
+      color: white;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .calendar div {
+      background-color: #e0f2fe;
+      padding: 6px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .calendar div:hover {
+      background-color: #cbd5e1;
+    }
+
+    body.dark .calendar div:hover {
+      background-color: #334155;
+    }
+
+    .info {
+      font-size: 14px;
+    }
+
+    .chatbot-button {
+      position: absolute;
+      bottom: 10px;
+      right: 5px;
+      padding: 10px 16px;
+      background-color: #6366f1;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .game-links {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.game-links button {
+  padding: 15px 20px;
+  font-size: 1rem;
+  border: none;
+  background-color: #673ab7;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s;
+}
+
+.game-links button:hover {
+  transform: scale(1.05);
+  background-color: #5e35b1;
+}
+
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 games per row */
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+
+  .game:hover {
+    transform: scale(1.05);
+  }
+
+  .game img {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 10px;
+  }
+
+  .survey-card {
+  background-color: #fff7fb;
+  border-left: 5px solid #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  transition: transform 0.2s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.survey-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+
+  .game span {
+    font-size: 0.9rem;
+    font-weight: bold;
+  }
+
+  .scrollable-articles {
+  max-height: 120px; /* 👈 Set how tall the scrollable content should be */
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.scrollable-articles ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.scrollable-articles li {
+  margin-bottom: 6px;
+}
+
+.scrollable-articles a {
+  color: #6a1b9a;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.scrollable-articles a:hover {
+  text-decoration: underline;
+}
+
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="sidebar">
+  
+    <div class="user-avatar"></div>
+    <div class="user-name" id="topbarName">Hii, User</div>
+
+    <div class="sidebar-icons">
+      <a href="index.html"><img src="habit.png" alt="Habit" />Habit Tracker</a>
+      <a href="diaryindex.html"><img src="book.png" alt="Diary" />Diary Writing</a>
+      <a href="exercise.html"><img src="exercise.png" alt="Exercise" />Exercises</a>
+      <a href="SciStudies.html"><img src="scistud.png" alt="Survey" />Survey & Study</a>
+      <a href="front.html"><img src="mood.png" alt="Mood" />Mood Tracker</a>
+    </div>
+
+    <div class="connect">
+      <strong>Connect with us</strong>
+      <a href="#">📧 joshiesm7@gmail.com</a>
+      <a href="#">💼 LinkedIn</a>
+      <a href="#">📸 Mmansijoshi</a>
+      <a href="#">📞 +91-9759370538</a>
+    </div>
+  </div>
+
+  
+
+  <div class="main">
+    <div class="topbar">
+      <div class="user-name" id="sidebarName">Hii, User</div>
+     
+      <div class="toggle-container">
+        <label for="darkToggle">🌙</label>
+        <input type="checkbox" id="darkToggle" />
+      </div>
+      <button class="diary-button">Your Journey Your Growth</button>
+    </div>
+
+    <div class="content">
+      <div>
+        <div class="section-title">Habit Tracker Progress</div>
+        <div class="chart-container">
+          <canvas id="habitChart"></canvas>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Mood Tracker Progress</div>
+        <div class="chart-container">
+          <canvas id="moodChart"></canvas>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-title">Diary Writing Calendar</div>
+        <div class="calendar" id="calendar"></div>
+      </div>
+
+      <div class="game-grid">
+        
+        <div class="game" onclick="location.href='PeaceVSDemon.html'">
+          <img src="demon.png" alt="Peace Vs Demon">
+          <span>Peace Vs Demon</span>
+        </div>
+        <div class="game" onclick="location.href='EmotionArenaGame.html'">
+          <img src="EA.png" alt="Emotion Arena">
+          <span>Emotion Arena</span>
+        </div>
+        <div class="game" onclick="location.href='TCgame.html'">
+          <img src="TCgame.png" alt="Thought Catcher">
+          <span>Thought Catcher</span>
+        </div>
+        <div class="game" onclick="location.href='Matchgame.html'">
+          <img src="match.png" alt="Match Game">
+          <span>Match Game</span>
+        </div>
+      </div>
+      
+
+      <div class="survey-card">
+        <h3>   Survey & Studies📚</h3>
+        <div class="scrollable-articles">
+          <ul>
+            <li><a href="SciStudies.html#article1" target="_blank">🧠 How Long Does It Take to Form a Habit?</a></li>
+            <li><a href="SciStudies.html#article2" target="_blank">📘 European Journal of Social Psychology</a></li>
+            <li><a href="SciStudies.html#article3" target="_blank">🔍 Systematic Review on Habit Formation</a></li>
+            <li><a href="SciStudies.html#article4" target="_blank">💡 Maintaining Healthy Habits (NIH)</a></li>
+            <li><a href="SciStudies.html#article5" target="_blank">⚖️ Self-Control vs. Consistency</a></li>
+            <li><a href="SciStudies.html#article6" target="_blank">🎮 Gamified Digital Tools</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      
+      
+      
+
+      <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+        <div class="section-title">Health Bot+ </div>
+        <a href="chatbot.html">
+          <img src="chatbot.gif" alt="Chatbot" width="200" height="200" style="cursor: pointer;" />
+        </a>
+      </div>
+
+      <div></div>
+     
+    </div>
+  </div>
+  
+</div>
+
+<script>
+  const darkToggle = document.getElementById("darkToggle");
+  darkToggle.addEventListener("change", () => {
+    document.body.classList.toggle("dark");
+  });
+
+  fetch('/habit-summary')
+  .then(res => res.json())
+  .then(data => {
+    const labels = data.map(entry => entry.activity_date);
+    const counts = data.map(entry => entry.count);
+
+    new Chart(document.getElementById('habitChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Habits Completed',
+          data: counts,
+          backgroundColor: '#4f46e5'
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  });
+;
+
+const emojiToValue = { "😢": 1, "☹️": 2, "😐": 3, "😊": 4, "😄": 5 };
+
+fetch('/get-entries')
+  .then(res => res.json())
+  .then(data => {
+    const labels = data.map(e => {
+      const d = new Date(e.entry_date);
+      return d.getDate();
+    });
+    const moodValues = data.map(entry => emojiToValue[entry.mood] ?? 50);
+
+    new Chart(document.getElementById('moodChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Mood Level',
+          data: moodValues,
+          borderColor: '#10b981',
+          fill: false,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, max: 100 } }
+      }
+    });
+  });
+
+  async function highlightDiaryDates() {
+    const res = await fetch("/diary-dates", {
+      credentials: "include"
+    });
+
+    if (!res.ok) return console.error("❌ Failed to fetch diary dates");
+
+    const data = await res.json();
+    const diaryDates = data.dates; // array of "YYYY-MM-DD"
+
+    // Highlight dates on your calendar (depends on library)
+    // Assuming each date cell has id like "date-YYYY-MM-DD"
+    diaryDates.forEach(date => {
+      const cell = document.getElementById("date-" + date);
+      if (cell) {
+        cell.classList.add("highlight-diary");
+      }
+    });
+  }
+
+  window.addEventListener("DOMContentLoaded", highlightDiaryDates);
+  
+  const today = new Date();
+  const todayDate = today.getDate();
+  const currentMonthDays = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+  const calendarEl = document.getElementById('calendar');
+  const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  weekDays.forEach(day => {
+    const dayEl = document.createElement('div');
+    dayEl.innerText = day;
+    dayEl.style.fontWeight = 'bold';
+    calendarEl.appendChild(dayEl);
+  });
+  for (let i = 1; i <= currentMonthDays; i++) {
+  const dayBox = document.createElement('div');
+  const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+  dayBox.id = "date-" + formattedDate;
+  dayBox.innerText = i;
+
+   
+    if (i > todayDate) {
+      dayBox.style.opacity = '0.4';
+      dayBox.style.pointerEvents = 'none';
+    } else {
+      dayBox.style.cursor = 'pointer';
+      dayBox.addEventListener('click', () => {
+  alert("Open diary for date: " + i);
+    });
+
+    }
+    calendarEl.appendChild(dayBox);
+  }
+  // 🔑 Fetch user ID from session and save to localStorage
+  fetch('/get-user-id', {
+  credentials: 'include'  // ← this tells the browser to send cookies
+})
+
+  .then(res => res.json())
+  .then(data => {
+    if (data.user_id) {
+      localStorage.setItem('user_id', data.user_id);
+      console.log("User ID saved to localStorage:", data.user_id);
+    } else {
+      console.warn("User not logged in.");
+    }
+  })
+  .catch(err => console.error("Error fetching user ID:", err));
+
+
+  fetch("/get-user-name", {
+  method: "GET",
+  credentials: "include"
+})
+.then(res => res.json())
+.then(data => {
+  const nameText = data.name ? "Hii, " + data.name : "Hii, Guest";
+
+  const sidebarEl = document.getElementById("sidebarName");
+  const topbarEl = document.getElementById("topbarName");
+
+  if (sidebarEl) sidebarEl.textContent = nameText;
+  if (topbarEl) topbarEl.textContent = nameText;
+})
+.catch(err => {
+  console.error("Error fetching user name:", err);
+});
+
+
+
+
+
+</script>
+</body>
+</html>

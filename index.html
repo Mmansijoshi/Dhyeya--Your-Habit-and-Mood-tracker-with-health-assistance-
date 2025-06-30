@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Habit Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f1f8fc;
+      text-align: center;
+      padding: 20px;
+    }
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #bde0fe, #f3c6ff);
+      font-family: 'Segoe UI', sans-serif;
+      height: 100vh;
+    }
+    h1 {
+      font-size: 2rem;
+    }
+
+    .selected-activities {
+      margin: 20px 0;
+    }
+
+    .activity-tag {
+      display: inline-flex;
+      align-items: center;
+      border: 2px solid #4caf50;
+      color: #4caf50;
+      border-radius: 20px;
+      padding: 8px 15px;
+      margin: 5px;
+      font-weight: bold;
+      background-color: #e6ffe6;
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: red;
+      font-size: 1.2em;
+      margin-left: 8px;
+      cursor: pointer;
+    }
+
+    select, input[type="text"], button {
+      margin: 8px;
+      padding: 8px;
+      font-size: 1rem;
+    }
+
+    option.green-tick {
+      color: green;
+      font-weight: bold;
+    }
+
+    .floating-progress {
+      position: fixed;
+      bottom: 100px;
+      right: 80px;
+      background: #72e376;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      padding: 10px 16px;
+      z-index: 1000;
+      cursor: pointer;
+      width: 180px;
+      text-align: left;
+    }
+
+    .progress-details {
+      display: none;
+      margin-top: 10px;
+    }
+
+    .progress-header {
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .showing .progress-details {
+      display: block;
+    }
+
+    .proceed-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .check-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #673ab7;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.check-btn:hover {
+  background-color: #5e35b1;
+}
+
+
+    .proceed-btn:hover {
+      background-color: #d3d4d3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to Habit and Diary</h1>
+  <h2>Please choose the activities you want me to track for your week</h2>
+
+  <div class="selected-activities" id="selectedActivitiesContainer"></div>
+
+  <!-- Dropdown for predefined activities -->
+  <select id="activityDropdown">
+    <option value="">-- Select an activity --</option>
+  </select>
+
+  <!-- Custom input and button -->
+  <input type="text" id="customActivity" placeholder="Add custom activity" />
+  <button onclick="addCustomActivity()">Add Activity</button>
+
+  <br />
+  <button class="proceed-btn" onclick="proceed()">Proceed with New Tracker</button>
+  <br />
+<button class="check-btn" onclick="window.location.href='habit2.html'">Check Existing Track</button>
+
+
+  <!-- Floating Progress -->
+  <div class="floating-progress" onclick="toggleProgress()" id="progressBox">
+    📊 <strong>My Progress</strong>
+    <div class="progress-details" id="progressDetails">
+      🔥 Streak: 0 days<br />
+      😊 Mood: 🙂<br />
+      💡 Keep up the great work,you are moving towards extracting the best version of yours!
+    </div>
+  </div>
+
+  <script>
+    const predefinedActivities = [
+      "Reading", "Journaling", "Wake Up Early", "No Sugar", "Drink Water", "Meditation", "Learn Coding", "Yoga",
+      "Eat Healthy", "Photography", "Exercise", "Stretching", "Gratitude", "Write Goals", "No Social Media", "Sleep by 10 PM",
+      "Cold Shower", "No Junk Food", "Running", "Sketching", "Language Practice", "Practice Music", "Mindfulness", "Time Block",
+      "Tidy Room", "Meal Prep", "Step Goal", "Intermittent Fasting", "Affirmations", "Volunteer", "Read News",
+      "Creative Writing", "Financial Budgeting", "Deep Work", "Break Walks", "Call Family", "Healthy Breakfast", "Meditate Before Bed",
+      "Track Expenses", "Plan Day", "Visualisation", "Breathing Exercise", "No Complaints", "Organise Desk", "Pomodoro Practice"
+    ];
+
+    const selected = new Set();
+    const selectedContainer = document.getElementById("selectedActivitiesContainer");
+    const dropdown = document.getElementById("activityDropdown");
+    const customInput = document.getElementById("customActivity");
+
+    function populateDropdown() {
+      dropdown.innerHTML = '<option value="">-- Select an activity --</option>';
+      predefinedActivities.forEach(act => {
+        const option = document.createElement("option");
+        option.value = act;
+        if (selected.has(act)) {
+          option.textContent = `✓ ${act}`;
+          option.classList.add("green-tick");
+        } else {
+          option.textContent = act;
+        }
+        dropdown.appendChild(option);
+      });
+    }
+
+    dropdown.addEventListener("change", () => {
+      const val = dropdown.value;
+      if (val) {
+        addActivity(val);
+        dropdown.value = "";
+      }
+    });
+
+    function addCustomActivity() {
+      const val = customInput.value.trim();
+      if (val) {
+        addActivity(val);
+        customInput.value = "";
+      }
+    }
+
+    function addActivity(name) {
+      if (selected.size >= 7) {
+        alert("You can only select up to 7 activities.");
+        return;
+      }
+      if (selected.has(name)) return;
+
+      selected.add(name);
+      updateSelectedDisplay();
+      populateDropdown();
+    }
+
+    function removeActivity(name) {
+      selected.delete(name);
+      updateSelectedDisplay();
+      populateDropdown();
+    }
+
+    function updateSelectedDisplay() {
+      selectedContainer.innerHTML = "";
+      selected.forEach(activity => {
+        const tag = document.createElement("div");
+        tag.className = "activity-tag";
+        tag.innerHTML = `${activity} <button class="remove-btn" onclick="removeActivity('${activity}')">&times;</button>`;
+        selectedContainer.appendChild(tag);
+      });
+    }
+
+    function proceed() {
+      if (selected.size === 0) {
+        alert("Please select at least one activity.");
+        return;
+      }
+      localStorage.setItem("selectedActivities", JSON.stringify([...selected]));
+      window.location.href = "habit2.html";
+    }
+
+    function toggleProgress() {
+      document.getElementById("progressBox").classList.toggle("showing");
+    }
+
+    populateDropdown();
+  </script>
+</body>
+</html>

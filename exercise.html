@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Habit Exercises</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ea8eca, #7ed2ee);
+      padding: 40px 60px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 40px;
+      margin-bottom: 50px;
+      color: #333;
+    }
+
+    h2 {
+      font-size: 28px;
+      margin: 30px 0 15px 5px;
+      color: #444;
+    }
+
+    .scroll-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 44px;
+      padding: 10px;
+      scroll-snap-type: x mandatory;
+    }
+
+    .scroll-container::-webkit-scrollbar {
+      height: 10px;
+    }
+
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: #bbb;
+      border-radius: 5px;
+    }
+
+    .card {
+      flex: 0 0 auto;
+      width: 220px;
+      height: 260px;
+      background-color: rgb(229, 198, 198);
+      border-radius: 14px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 14px;
+      scroll-snap-align: start;
+      transition: transform 0.2s ease-in-out;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .card p {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 600;
+      margin-top: 12px;
+      color: #222;
+    }
+    .back-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  padding: 10px 15px;
+  font-size: 1rem;
+  background-color: #673ab7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+  </style>
+</head>
+<body>
+
+  <h1>✨ Explore Habit Exercises</h1>
+
+  <!-- Mindfulness & Emotional Wellness -->
+  <h2><b>Mindfulness & Emotional Wellness</b></h2>
+  <div class="scroll-container">
+    <div class="card">
+      <!-- Updated Meditation GIF -->
+      <img src="meditation-relaxing.gif.gif" alt="Meditation">
+      <p>Meditation</p>
+    </div>
+    <!-- ...other cards... -->
+
+  <div class="card">
+    <!-- GIF of someone writing in a diary -->
+    <img src="journalising.gif" alt="Writing in Diary">
+    <p>Journaling</p>
+  </div>
+  <div class="card">
+    <!-- GIF of someone practicing deep breathing yoga -->
+    <img src="deep_breath.gif" alt="Deep Breathing Yoga">
+    <p>Deep Breathing</p>
+  </div>
+  <div class="card">
+      <img src="morning_affirmation.gif" alt="Positive Affirmations">
+      <p>Positive Affirmations</p>
+    </div>
+    <div class="card">
+      <img src="emo_checkin.gif" alt="Emotional Check-in">
+      <p>Emotion Check-In</p>
+    </div>
+  </div>
+
+  <!-- Physical Wellness -->
+  <h2>Physical Wellness</h2>
+  <div class="scroll-container">
+    <div class="card">
+      <img src="strech.gif" alt="Stretching">
+      <p>Stretching</p>
+    </div>
+    <div class="card">
+      <img src="yoga.gif" alt="Yoga">
+      <p>Yoga</p>
+    </div>
+    <div class="card">
+      <img src="walking.gif" alt="Walking">
+      <p>Walking</p>
+    </div>
+    <div class="card">
+      <img src="hydration.gif" alt="Hydration">
+      <p>Hydration</p>
+    </div>
+    <div class="card">
+      <img src="balanced_diet.gif" alt="Balanced Diet">
+      <p>Balanced Diet</p>
+    </div>
+  </div>
+
+  <!-- Digital Detox & Focus -->
+  <h2>Digital Detox & Focus</h2>
+  <div class="scroll-container">
+    <div class="card">
+      <img src="no_screens.gif" alt="No Screens 1 Hour Before Bed">
+      <p>No Screens 1hr Before Bed</p>
+    </div>
+    <div class="card">
+      <img src="pomodoro.gif" alt="Pomodoro Focus">
+      <p>Pomodoro Focus</p>
+    </div>
+    <div class="card">
+      <img src="limit.gif" alt="Limit Social Media">
+      <p>Limit Social Media</p>
+    </div>
+  </div>
+
+  <!-- Sleep & Rest -->
+  <h2>Sleep & Rest</h2>
+  <div class="scroll-container">
+    <div class="card">
+      <img src="bedtime_before11.gif" alt="Sleep Before 11 PM">
+      <p>Sleep Before 11 PM</p>
+    </div>
+    <div class="card">
+      <img src="wake_up.gif" alt="Wake Up on Time">
+      <p>Wake Up on Time</p>
+    </div>
+    <div class="card">
+      <img src="reflection.gif" alt="Bedtime Reflection">
+      <p>Bedtime Reflection</p>
+    </div>
+  </div>
+
+  <!-- Self-Growth & Productivity -->
+  <h2>Self-Growth & Productivity</h2>
+  <div class="scroll-container">
+    <div class="card">
+      <img src="read.gif" alt="Read a Book">
+      <p>Read a Book</p>
+    </div>
+    <div class="card">
+      <img src="something_new.gif" alt="Learn Something New">
+      <p>Learn Something New</p>
+    </div>
+    <div class="card">
+      <img src="daily_intention.gif" alt="Set Daily Intentions">
+      <p>Set Daily Intentions</p>
+    </div>
+    <div class="card">
+      <img src="declutter.gif" alt="Declutter">
+      <p>Declutter</p>
+    </div>
+    <div class="footer">
+      <button class="back-btn" onclick="window.location.href='dashboard.html'">⬅ Back to Dashboard</button>
+    </div>
+  </div>
+
+</body>
+</html>
